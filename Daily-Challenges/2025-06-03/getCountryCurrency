@@ -1,0 +1,35 @@
+public static String getCountryCurrency(String countryName) {
+	// Write your code here to fetch country currency from REST Countries API
+	// Use endpoint: https://restcountries.com/v3.1/name/{countryName} (GET method)
+	// Parse the JSON response and return the currency name from the currencies field
+	System.debug(
+		'Debug: Making HTTP GET request to REST Countries API for country: ' + countryName
+	);
+
+	Http http = new Http();
+
+	String url = 'https://restcountries.com/v3.1/name/' + countryName;
+
+	HttpRequest request = new HttpRequest();
+	request.setEndpoint(url);
+	request.setMethod('GET');
+	HttpResponse response = http.send(request);
+
+	if (response.getStatusCode() == 200) {
+
+		List<Object> outerList = (List<Object>) JSON.deserializeUntyped(response.getBody());
+
+		if (!outerList.isEmpty()) {
+			Map<String, Object> countryData = (Map<String, Object>) outerList[0];
+			Map<String, Object> currencies = (Map<String, Object>) countryData.get('currencies');
+			if (currencies != null && !currencies.isEmpty()) {
+				for (Object currencyObj : currencies.values()) {
+					Map<String, Object> currencyDetails = (Map<String, Object>) currencyObj;
+					return (String) currencyDetails.get('name');
+				}
+			}
+		}
+	}
+
+	return null;
+}

@@ -1,0 +1,20 @@
+public static Integer countCountriesByRegion(String region) {
+	// Write your code here to count countries in a region from REST Countries API
+	// Use endpoint: https://restcountries.com/v3.1/region/{region} (GET method)
+	// Parse the JSON response and return the count of countries in the array
+	System.debug('Debug: Making HTTP GET request to REST Countries API for region: ' + region);
+
+	Http http = new Http();
+	HttpRequest request = new HttpRequest();
+	request.setEndpoint('https://restcountries.com/v3.1/region/' + region);
+	request.setMethod('GET');
+
+	HttpResponse response = http.send(request);
+
+	if (response.getStatusCode() == 200) {
+		// Deserialize the JSON response to a List<Object>
+		List<Object> outerList = (List<Object>) JSON.deserializeUntyped(response.getBody());
+		return outerList.size();
+    }
+	return 0;
+}
