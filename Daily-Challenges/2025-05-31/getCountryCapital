@@ -1,0 +1,36 @@
+public static String getCountryCapital(String countryName) {
+	// Write your code here to fetch country capital from REST Countries API
+	// Use endpoint: https://restcountries.com/v3.1/name/{countryName} (GET method)
+	// Parse the JSON response and return the capital field (first element of array)
+	System.debug('Debug: Making HTTP GET request to REST Countries API for country: ' + countryName);
+
+	Http http = new Http();
+
+	//String url = 'https://restcountries.com/v3.1/name/' + countryName;
+	String url = 'https://restcountries.com/v3.1/name/Japan';
+
+	HttpRequest request = new HttpRequest();
+	request.setEndpoint(url);
+	request.setMethod('GET');
+	HttpResponse response = http.send(request);
+
+	if(response.getStatusCode() == 200){
+		List<Object> outerList = (List<Object>) JSON.deserializeUntyped(response.getBody());
+
+		if(!outerList.isEmpty()){
+			Map<String, Object> countryData = (Map<String, Object>) outerList[0];
+
+			// Iterate over keys and values in the country data map
+			for (String key : countryData.keySet()) {
+				System.debug('Country Data Key: ' + key + ', Value: ' + countryData.get(key));
+			}
+
+			List<Object> capital = (List<Object>) countryData.get('capital');
+			System.debug(capital[0]);
+
+			return (String) capital[0];
+		}
+	}
+
+	return null;
+}
